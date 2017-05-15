@@ -1,6 +1,7 @@
 """Exercicio Simulação discreta"""
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 rolamento = {'Vida do Rolamento (horas)': [1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900],
              'Probabilidade': [0.10, 0.13, 0.25, 0.13, 0.09, 0.12, 0.02, 0.06, 0.05, 0.05],
@@ -140,29 +141,49 @@ class Simulation:
         self.__reset__()
         print("\n\nCusto de trocar %i rolamento por vez com %i horas: %i " % (rolamentos,hours,self.__cost(self.__multiple_Calculation(hours,rolamentos))))
 
-    def compere_Media(self, hours,rolamentos):
+    def plot_Compere(self, hours, rolamentos, itr):
+        __unit_cost = []
+        __mult_cost = []
         custo_Total = 0
         aux = 0
-        for i in range(3):
-            self.__reset__()  # Reset all variables
-            dt = self.__unit_Calculation(hours)
-            #dt.to_csv(r'C:\Users\Renan\Dropbox\7º semestre\Simulação Discreta\It%i.csv' % (i + 1))
-            aux += len(dt.Espera) * 20
-            "Custo dos rolamentos"
-            aux += sum(dt.Espera) * 5
-            "Custo da máquina parada esperando pelo mecânico"
-            aux += len(dt.Espera) * 20 * 5
-            "Custo da máquina parada trocando rolamento"
-            aux += len(dt.Espera) * 20
-            "Custo do mecânico"
-            custo_Total += aux
-            print("\nCsusto de troca: %i" % (aux))
-            print(dt)
-            aux = 0
+        for i in range(itr):
+            for i in range(rolamentos):
+                self.__reset__()  # Reset all variables
+                dt = self.__unit_Calculation(hours)
+            # dt.to_csv(r'C:\Users\Renan\Dropbox\7º semestre\Simulação Discreta\It%i.csv' % (i + 1))
+                aux += len(dt.Espera) * 20
+                "Custo dos rolamentos"
+                aux += sum(dt.Espera) * 5
+                "Custo da máquina parada esperando pelo mecânico"
+                aux += len(dt.Espera) * 20 * 5
+                "Custo da máquina parada trocando rolamento"
+                aux += len(dt.Espera) * 20
+                "Custo do mecânico"
+                custo_Total += aux
+                print("\nCsusto de troca: %i" % (aux))
+                print(dt)
+                aux = 0
+            __unit_cost.append(custo_Total)
         print("\nCusto de trocar 1 rolamento por vez com %i horas: %i" % (hours, custo_Total))
-        self.__reset__()
-        print("\n\nCusto de trocar 3 rolamento por vez com %i horas: %i " % (hours,self.__cost(self.__triple_Calculation(hours))))
+        print(__unit_cost)
+        for i in range(itr):
+            self.__reset__()
+            __mult_cost.append(self.__cost(self.__multiple_Calculation(hours, rolamentos)))
+        print("\n\nCusto de trocar %i rolamento por vez com %i horas: %i " % (rolamentos,hours,self.__cost(self.__multiple_Calculation(hours,rolamentos))))
+        fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(10, 6))
+        ax[0].plot(__unit_cost, marker='o')
+        ax[0].set_ylabel('Cost')
+        ax[0].set_xlabel('Iterations')
+        ax[0].set_title('Custo de trocar um unico Rolamento')
+        ax[1].plot(__mult_cost, marker='o')
+        ax[1].set_ylabel('Cost')
+        ax[1].set_xlabel('Iterations')
+        ax[1].set_title('Custo de trocar varios Rolamentos')
+        plt.show()
+
+
+
 
 sml = Simulation()
-sml.compere(20000,10)
+sml.plot_Compere(20000,3,5)
 
